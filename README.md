@@ -35,13 +35,13 @@ Automated unit tests run in Node.js with zero external dependencies:
 
 - **Validation Tests (27 checks)**:
   ```bash
-  node test_validate.js
+  node tests/test_validate.js
   ```
 - **Compatibility Engine Tests (33 checks)**:
   ```bash
-  node test_engine.js
+  node tests/test_engine.js
   ```
 - **Run all tests together**:
   ```bash
-  node test_validate.js && node test_engine.js
+  node tests/test_validate.js && node tests/test_engine.js
   ```

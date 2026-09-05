@@ -1,21 +1,8 @@
 /**
  * Compatibility Engine for Hostel Food Compatibility Board
  * Pure logic module implementing diet, allergen, budget, and search rules.
+ * Consumes clean, normalized, and pre-validated data from validate.js.
  */
-
-// Resolve normalize helper from validate.js or environment
-let _normalize;
-if (typeof normalize !== "undefined") {
-  _normalize = normalize;
-} else if (typeof require !== "undefined") {
-  try {
-    _normalize = require("./validate.js").normalize;
-  } catch (e) {
-    _normalize = str => (typeof str === "string" ? str.trim().toUpperCase() : "");
-  }
-} else {
-  _normalize = str => (typeof str === "string" ? str.trim().toUpperCase() : "");
-}
 
 /**
  * Computes the exact list of exclusion reasons for a given dish against residents and budget.
@@ -36,19 +23,16 @@ function getExclusionReasons(dish, residents, budget) {
 
   // Iterate residents in resident table order
   for (const resident of residents) {
-    const residentDiet = _normalize(resident.diet);
-    const dishDiet = _normalize(dish.diet);
-
     // 1. Diet check first for this resident
     // VEGAN resident accepts only VEGAN dish
     // VEGETARIAN resident accepts VEGAN or VEGETARIAN dish
     // NON_VEGETARIAN / NO_RESTRICTION accepts any dish
-    if (residentDiet === "VEGAN") {
-      if (dishDiet !== "VEGAN") {
+    if (resident.diet === "VEGAN") {
+      if (dish.diet !== "VEGAN") {
         reasons.push(`DIET:${resident.name}`);
       }
-    } else if (residentDiet === "VEGETARIAN") {
-      if (dishDiet !== "VEGAN" && dishDiet !== "VEGETARIAN") {
+    } else if (resident.diet === "VEGETARIAN") {
+      if (dish.diet !== "VEGAN" && dish.diet !== "VEGETARIAN") {
         reasons.push(`DIET:${resident.name}`);
       }
     }
@@ -56,19 +40,11 @@ function getExclusionReasons(dish, residents, budget) {
     // 2. Allergen check follows for this resident
     // Exact match only - no inference, aliases, or cross-contamination
     // Reason ordering follows the dish's ingredient tag order
-    if (Array.isArray(resident.allergens) && resident.allergens.length > 0) {
-      const residentAllergens = new Set(
-        resident.allergens
-          .map(a => _normalize(a))
-          .filter(a => a !== "" && a !== "NONE")
-      );
-
-      if (Array.isArray(dish.tags)) {
-        for (const tag of dish.tags) {
-          const normTag = _normalize(tag);
-          if (residentAllergens.has(normTag)) {
-            reasons.push(`ALLERGEN:${resident.name}:${normTag}`);
-          }
+    if (resident.allergens && resident.allergens.length > 0) {
+      const residentAllergens = new Set(resident.allergens);
+      for (const tag of dish.tags) {
+        if (residentAllergens.has(tag)) {
+          reasons.push(`ALLERGEN:${resident.name}:${tag}`);
         }
       }
     }
@@ -131,11 +107,9 @@ function filterCompatibleDishes(compatibleDishes, query) {
   }
 
   return compatibleDishes.filter(dish => {
-    const cafeMatch = typeof dish.cafe === "string" && dish.cafe.toLowerCase().includes(trimmedQuery);
-    const nameMatch = typeof dish.name === "string" && dish.name.toLowerCase().includes(trimmedQuery);
-    const tagMatch = Array.isArray(dish.tags) && dish.tags.some(tag =>
-      typeof tag === "string" && tag.toLowerCase().includes(trimmedQuery)
-    );
+    const cafeMatch = dish.cafe.toLowerCase().includes(trimmedQuery);
+    const nameMatch = dish.name.toLowerCase().includes(trimmedQuery);
+    const tagMatch = dish.tags.some(tag => tag.toLowerCase().includes(trimmedQuery));
 
     return cafeMatch || nameMatch || tagMatch;
   });

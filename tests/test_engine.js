@@ -1,5 +1,5 @@
-const { BUILT_IN_DATA } = require("./data.js");
-const { getExclusionReasons, computeCompatibility, filterCompatibleDishes } = require("./engine.js");
+const { BUILT_IN_DATA } = require("../src/js/data.js");
+const { getExclusionReasons, computeCompatibility, filterCompatibleDishes } = require("../src/js/engine.js");
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));

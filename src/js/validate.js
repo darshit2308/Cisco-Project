@@ -39,6 +39,11 @@ function validateBoard(residents, dishes, budget) {
     const resident = residents[i];
     const rowNum = i + 1;
 
+    /*
+    For resident entry
+    */
+
+    // Means, resident entry is itself missing, or, resident is not a valid object (Ex. residents is defined as const resident = "dk")
     if (!resident || typeof resident !== "object") {
       return {
         type: "INVALID_INPUT",
@@ -48,7 +53,9 @@ function validateBoard(residents, dishes, budget) {
         message: `Resident at row ${rowNum} is not a valid object`
       };
     }
-
+    /*
+    For resident name
+    */
     // Name must not be empty after trimming
     if (typeof resident.name !== "string" || resident.name.trim() === "") {
       return {
@@ -60,6 +67,9 @@ function validateBoard(residents, dishes, budget) {
       };
     }
 
+    /*
+    For resident diet
+    */
     // Diet must be one of the allowed resident diets
     const normDiet = normalize(resident.diet);
     if (!VALID_RESIDENT_DIETS.includes(normDiet)) {
@@ -71,6 +81,10 @@ function validateBoard(residents, dishes, budget) {
         message: `Resident diet must be one of: ${VALID_RESIDENT_DIETS.join(", ")}`
       };
     }
+
+    /*
+    For resident allergens
+    */
 
     // Allergens must be an array
     if (!Array.isArray(resident.allergens)) {
@@ -96,9 +110,18 @@ function validateBoard(residents, dishes, budget) {
         };
       }
     }
+
+    // Normalize resident fields in-place for downstream engine use
+    resident.name = resident.name.trim();
+    resident.diet = normDiet;
+    resident.allergens = resident.allergens
+      .map(a => normalize(a))
+      .filter(a => a !== "" && a !== "NONE");
   }
 
-  // 2. Check Dishes
+  /*
+  For dishes
+  */
   if (!Array.isArray(dishes)) {
     return {
       type: "INVALID_INPUT",
@@ -152,6 +175,10 @@ function validateBoard(residents, dishes, budget) {
     }
     seenDishIds.add(normId);
 
+    /*
+    For dish cafe
+    */
+
     // Cafe must not be empty after trimming
     if (typeof dish.cafe !== "string" || dish.cafe.trim() === "") {
       return {
@@ -163,6 +190,9 @@ function validateBoard(residents, dishes, budget) {
       };
     }
 
+    /*
+    For dish name
+    */
     // Dish name must not be empty after trimming
     if (typeof dish.name !== "string" || dish.name.trim() === "") {
       return {
@@ -173,6 +203,10 @@ function validateBoard(residents, dishes, budget) {
         message: "Dish name must not be empty"
       };
     }
+
+    /*
+    For dish diet
+    */
 
     // Diet must be one of the allowed dish diets (VEGAN, VEGETARIAN, NON_VEGETARIAN)
     const normDishDiet = normalize(dish.diet);
@@ -186,6 +220,9 @@ function validateBoard(residents, dishes, budget) {
       };
     }
 
+    /*
+    For dish ingredients
+    */
     // Ingredient tags must be a non-empty array with non-empty tags
     if (!Array.isArray(dish.tags) || dish.tags.length === 0) {
       return {
@@ -209,7 +246,9 @@ function validateBoard(residents, dishes, budget) {
         };
       }
     }
-
+    /*
+    For dish price
+    */
     // Price must be a positive whole integer (natural number)
     if (!Number.isInteger(dish.price) || dish.price <= 0) {
       return {
@@ -220,9 +259,18 @@ function validateBoard(residents, dishes, budget) {
         message: "Dish price must be a positive whole number"
       };
     }
+
+    // Normalize dish fields in-place for downstream engine use
+    dish.id = trimmedId;
+    dish.cafe = dish.cafe.trim();
+    dish.name = dish.name.trim();
+    dish.diet = normDishDiet;
+    dish.tags = dish.tags.map(t => normalize(t));
   }
 
-  // 3. Check Budget
+  /* 
+  For budget
+  */
   if (!Number.isInteger(budget) || budget <= 0) {
     return {
       type: "INVALID_INPUT",

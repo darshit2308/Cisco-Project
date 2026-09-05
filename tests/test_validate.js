@@ -1,5 +1,5 @@
-const { BUILT_IN_DATA } = require("./data.js");
-const { validateBoard, normalize } = require("./validate.js");
+const { BUILT_IN_DATA } = require("../src/js/data.js");
+const { validateBoard, normalize } = require("../src/js/validate.js");
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
