@@ -77,15 +77,43 @@ console.log("--- Running Validation Tests ---");
   assert("Rejects empty allergen tag", 
     err && err.type === "INVALID_INPUT" && err.table === "residents" && err.row === 1 && err.field === "allergens"
   );
+
+  // Explicit check: allergens containing a valid tag followed by whitespace
+  data.residents[0].allergens = ["PEANUT", " "];
+  err = validateBoard(data.residents, data.dishes, data.budget);
+  assert("Rejects allergens array containing ['PEANUT', ' ']", 
+    err && err.type === "INVALID_INPUT" && err.table === "residents" && err.row === 1 && err.field === "allergens"
+  );
+
+  // Explicit check: allergens containing null
+  data.residents[0].allergens = ["PEANUT", null];
+  err = validateBoard(data.residents, data.dishes, data.budget);
+  assert("Rejects allergens array containing null element", 
+    err && err.type === "INVALID_INPUT" && err.table === "residents" && err.row === 1 && err.field === "allergens"
+  );
 }
 
-// Test 7: Dish ID must not be empty
+// Test 7: Dish ID must not be empty or null
 {
   const data = deepClone(BUILT_IN_DATA);
   data.dishes[0].id = "  ";
-  const err = validateBoard(data.residents, data.dishes, data.budget);
-  assert("Rejects empty dish ID", 
+  let err = validateBoard(data.residents, data.dishes, data.budget);
+  assert("Rejects empty string dish ID", 
     err && err.type === "INVALID_INPUT" && err.table === "dishes" && err.field === "id"
+  );
+
+  // Explicit check: dish ID is null
+  data.dishes[0].id = null;
+  err = validateBoard(data.residents, data.dishes, data.budget);
+  assert("Rejects null dish ID", 
+    err && err.type === "INVALID_INPUT" && err.table === "dishes" && err.row === 1 && err.field === "id"
+  );
+
+  // Explicit check: dish ID is undefined
+  data.dishes[0].id = undefined;
+  err = validateBoard(data.residents, data.dishes, data.budget);
+  assert("Rejects undefined dish ID", 
+    err && err.type === "INVALID_INPUT" && err.table === "dishes" && err.row === 1 && err.field === "id"
   );
 }
 
