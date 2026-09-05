@@ -1,1 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hostel Food Compatibility Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo-area">
+          <span class="logo-icon">🥗</span>
+          <div>
+            <h1>Hostel Food Compatibility Board</h1>
+            <p class="subtitle">Match group dietary restrictions, allergens, and per-person budget</p>
+          </div>
+        </div>
+        <!-- Global Controls -->
+        <div class="global-controls">
+          <div class="budget-group">
+            <label for="budget-input">Per-Person Budget (₹):</label>
+            <input type="number" id="budget-input" value="150" min="1" step="1">
+          </div>
+          <button id="btn-check-compatibility" class="btn btn-primary">
+            <span>Check Compatibility</span>
+          </button>
+          <button id="btn-reset" class="btn btn-secondary">
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </header>
 
+    <!-- Validation Alert Box -->
+    <div id="validation-alert" class="alert hidden" role="alert"></div>
+
+    <!-- Main Data Tables Section -->
+    <section class="tables-section">
+      <!-- Residents Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Residents (<span id="residents-count">3</span>)</h2>
+          <span class="panel-hint">Editable in-place</span>
+        </div>
+        <div class="table-wrapper">
+          <table id="residents-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th style="width: 140px;">Name</th>
+                <th style="width: 170px;">Diet</th>
+                <th>Allergens (comma-separated)</th>
+              </tr>
+            </thead>
+            <tbody id="residents-tbody">
+              <!-- Rendered dynamically by ui.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dishes Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Dishes (<span id="dishes-count">5</span>)</h2>
+          <span class="panel-hint">Editable in-place</span>
+        </div>
+        <div class="table-wrapper">
+          <table id="dishes-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th style="width: 130px;">Cafe</th>
+                <th style="width: 150px;">Dish Name</th>
+                <th style="width: 160px;">Diet</th>
+                <th>Ingredient Tags (comma-separated)</th>
+                <th style="width: 100px;">Price (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="dishes-tbody">
+              <!-- Rendered dynamically by ui.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="results-section">
+      <div class="results-header">
+        <div class="results-summary-row">
+          <div class="summary-left">
+            <h2>Compatibility Results</h2>
+            <div id="compatible-count-summary" class="summary-badge hidden">0 compatible dishes</div>
+          </div>
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Search compatible dishes (cafe, name, tag)..." 
+              autocomplete="off"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="results-layout">
+        <!-- Compatible Dishes Column -->
+        <div class="result-column compatible-column">
+          <div class="column-header">
+            <h3>Compatible Dishes</h3>
+            <span class="badge badge-success" id="compatible-column-count">0</span>
+          </div>
+          <div id="compatible-results" class="results-list">
+            <div class="empty-state">Click "Check Compatibility" to calculate results.</div>
+          </div>
+        </div>
+
+        <!-- Excluded Dishes Column -->
+        <div class="result-column excluded-column">
+          <div class="column-header">
+            <h3>Excluded Dishes</h3>
+            <span class="badge badge-error" id="excluded-column-count">0</span>
+          </div>
+          <div id="excluded-results" class="results-list">
+            <div class="empty-state">Excluded dishes and reasons will appear here.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts in dependency order -->
+  <script src="data.js"></script>
+  <script src="validate.js"></script>
+  <script src="engine.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>
